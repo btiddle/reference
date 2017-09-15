@@ -18,3 +18,15 @@ https://docs.oracle.com/javase/8/docs/api/index.html?java/
 CONQUERING THE COMMAND LINE
 http://conqueringthecommandline.com/
 
+Maven
+https://maven.apache.org/
+
+HttpClient Basic Authentication
+- http://www.baeldung.com/httpclient-4-basic-authentication
+- https://stackoverflow.com/questions/28366969/java-httpclient-4-3-6-basic-authentication-with-complete-uri-and-scheme
+
+
+HTTP Test server that accepts GET/Post calls
+- https://stackoverflow.com/questions/5725430/http-test-server-that-accepts-get-post-calls
+- http://httpbin.org/
+

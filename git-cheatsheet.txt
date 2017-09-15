@@ -1,0 +1,636 @@
+Git Cheatsheet
+........................................................................
+
+
+========================================================================
+References
+========================================================================
+
+- git home page
+  https://git-scm.com/
+
+- git - the simple guide
+  http://rogerdudler.github.io/git-guide/
+
+- Git Cheatsheet by NDP Software
+  http://ndpsoftware.com/git-cheatsheet.html
+
+- Atlassian Git Tutorials
+  https://www.atlassian.com/git/tutorials
+
+- Go to youtube.com and search for:
+  "Github Tutorial For Beginners - Github Basics for Mac or Windows & 
+  Source Control Basics"
+
+  This guy has two videos that covers everything you need to master 
+  Git/Github, and he uses an example discusses the general workflow he 
+  uses, day-to-day, when working in a team.
+
+- Git Cheat Sheet
+  https://www.git-tower.com/blog/git-cheat-sheet/
+
+========================================================================
+Setup Information/Suggestions
+=======================================================================
+
+- Generating an SSH key
+  https://help.github.com/articles/generating-an-ssh-key/
+
+- Install Bash git completion
+  https://github.com/bobthecow/git-flow-completion/wiki/Install-Bash-git-completion
+
+- add this to your ~/.bash_profile
+
+##################### PROMPT ############################
+#########################################################
+function parse_git_branch {
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1) / '
+}
+
+export -f parse_git_branch
+
+function parse_host_name {
+  #echo sr`echo $HOSTNAME 2> /dev/null | sed -e s/[^0-9]//g`
+  echo "\h\[$(tput sgr0)\]"
+  #echo $HOSTNAME
+  #echo '\h'
+}
+
+function format_time {
+  echo '[$(date +%H:%M:%S)]'
+}
+
+function proml {
+  local        BLUE="\[\033[0;34m\]"
+  local  LIGHT_BLUE="\[\033[1;34m\]"
+  local         RED="\[\033[0;31m\]"
+  local   LIGHT_RED="\[\033[1;31m\]"
+  local       GREEN="\[\033[0;32m\]"
+  local LIGHT_GREEN="\[\033[1;32m\]"
+  local       WHITE="\[\033[1;37m\]"
+  local        GRAY="\[\033[0;37m\]"
+  local  LIGHT_GRAY="\[\033[1;37m\]"
+  case $TERM in
+    xterm*)
+    TITLEBAR='\[\033]0;\u@\h:\w\007\]'
+    ;;  
+    *)  
+    TITLEBAR=""
+    ;;  
+  esac
+
+#Old main line:
+#$BLUE$(format_time) $LIGHT_RED$(parse_host_name):\W$GREEN \$(parse_git_branch)\
+
+PS1="${TITLEBAR}\
+$LIGHT_RED$(parse_host_name)$GRAY:$LIGHT_BLUE\W$GREEN \$(parse_git_branch)\
+$GRAY> $WHITE"
+PS2='> '
+PS4='+ '
+}
+
+proml
+
+========================================================================
+github info
+=======================================================================
+
+- To find a file in a githib repository
+
+t<filename>
+
+
+===========================================================================
+create a new repository
+========================================================================
+
+- to create a new git repository
+
+git init [<project directory>]
+
+- to create a new git repository with projects shared by a group
+
+git --bare init [<project directory>]
+
+========================================================================
+check git config settings
+========================================================================
+
+- check user name and email
+
+git config --list
+
+- to configure your Git username and email 
+
+git config --global user.name "Emma Paris"
+git config --global user.email "eparis@atlassian.com"
+
+- For "Install the git-credential-osxkeychain helper" see
+  https://www.atlassian.com/git/tutorials/install-git/mac-os-x
+
+========================================================================
+workflow
+========================================================================
+
+- Basic pattern is edit/stage/commit.
+
+- Your local repository consists of three "trees" maintained by git. The
+  first one is your "Working Directory" which holds the actual files.
+  The second one is the "Index" which acts as a staging area and finally
+  the HEAD which points to the last commit you've made.
+
+
+       Working                Staging            .git directory
+      Directory                Area                (Repository)
+         |                       |                       |
+         |<----------------------------------------------|
+         |<            Checkout the project              |
+         |<----------------------------------------------|
+         |                       |                       |
+         |---------------------->|                       |
+         | Stage Fixes         ->|                       |
+         |---------------------->|                       |
+         |                       |                       |
+         |                       |---------------------->|
+         |                       | Commit                |
+         | --------------------->|---------------------->|
+         |                       |                       |
+
+- The Git directory is where Git stores the metadata and object database
+  for your project. This is the most important part of Git, and it is 
+  what is copied when you clone a repository from another computer.
+
+- The working directory is a single checkout of one version of the 
+  project. These files are pulled out of the compressed database in the 
+  Git directory and placed on disk for you to use or modify.
+
+- The staging area is a file, generally contained in your Git directory,
+  that stores information about what will go into your next commit. It’s
+  sometimes referred to as the “index”, but it’s also common to refer to
+  it as the staging area.
+
+- The basic Git workflow is edit/stage/commit:
+
+  1. You modify files in your working directory.
+     edit files -> modified
+
+  2. You stage the files, adding snapshots of them to your staging area.
+     git add -> staged
+
+  3. You do a commit, which takes the files as they are in the staging
+     area and stores that snapshot permanently to your Git directory.
+     git commit -> committed
+
+
+
+========================================================================
+checkout a repository
+========================================================================
+
+- create a working copy of a local repository by running the command
+
+git clone /path/to/repository
+
+- when using a remote server
+
+git clone username@host:/path/to/repository
+
+- HTTPS example (read access)
+
+========================================================================
+add & commit
+========================================================================
+
+- You can propose changes (add it to the Index) using
+
+git add <filename>    // file
+git add <directory>   // directory
+git add *             // everything
+git add -p            // interactive staging session
+
+- To commit changes to head (local repository)
+
+git commit -m "Commit message"
+
+- Convention
+  - Summarize entire commit on the 1st line in less than 50 characters
+  - Leave a blank line
+  - Wrap remaining lines at 72 column using a hanging indent.
+  - Include detailed explanation of what’s been changed
+  - Use present tense
+  - Example:
+
+    Change the message displayed by hello.py
+
+    - Update the sayHello() function to output the user's name
+    - Change the sayGoodbye() function to a friendlier messages
+
+
+========================================================================
+git stash
+========================================================================
+
+- //TODO: https://www.atlassian.com/git/tutorials/saving-changes/git-commit
+
+
+========================================================================
+git status
+========================================================================
+
+git status
+
+- Inspect the working directory and the staging area.
+
+- List which files are staged, unstaged, and untracked.
+
+
+========================================================================
+git log
+========================================================================
+
+git log
+
+- git log only operates on the committed history.
+
+git log --oneline
+
+- Showing commit number and title on one line for each commit.
+
+
+========================================================================
+git checkout
+========================================================================
+
+git checkout a1e8fb5
+git checkout master
+git checkout a1e8fb5 hello.py
+git checkout HEAD hello.py
+
+- Can checkout out files, commits and branches. 
+
+- Use git revert or git reset to undo any undesired changes.
+
+- Checking out an old commit is a read-only operation and puts you in a
+  detached HEAD state.
+
+- On the other hand, checking out an old file does affect the current
+  state of your repository. You can re-commit the old version in a new
+  snapshot as you would any other file.
+
+
+========================================================================
+gti revert
+========================================================================
+
+- Reverting is designed to safely undo a public commit.
+
+- Reverting maintains the original changeset and uses a new commit 
+  to apply the undo.
+
+- The git revert command undoes a committed snapshot. It figures out 
+  how to undo the changes introduced by the commit and appends a new 
+  commit with the resulting content. 
+
+- git revert undoes a single commit.
+
+- git revert doesn’t change the project history.
+
+- git revert is able to target an individual commit at an arbitrary 
+  point in the history.
+
+git revert <commit>
+
+- Generate a new commit that undoes all of the changes introduced in 
+  <commit>, then apply it to the current branch.
+
+- Reverting should be used when you want to remove an entire commit 
+  from your project history. This can be useful, for example, if 
+  you’re tracking down a bug and find that it was introduced by a 
+  single commit. Instead of manually going in, fixing it, and 
+  committing a new snapshot, you can use git revert to automatically 
+  do all of this for you.
+
+# Edit some tracked files
+
+# Commit a snapshot
+git commit -m "Make some changes that will be undone"
+
+# Revert the commit we just created
+git revert HEAD
+
+- Commit a snapshot, then immediately undo it with a revert.
+
+========================================================================
+gti reset
+========================================================================
+
+- Reset is NOT designed to undo a public commit.
+
+- Designed to undo local changes. 
+
+- Resetting completely removes a changeset.
+
+- You should never use git reset <commit> when any snapshots after 
+  <commit> have been pushed to a public repository. After publishing 
+  a commit, you have to assume that other developers are reliant upon
+  it.
+
+- Removing a commit that other team members have continued developing
+  poses serious problems for collaboration. When they try to sync up 
+  with your repository, it will look like a chunk of the project 
+  history abruptly disappeared.
+
+- git reset "resets" back to the previous state of a project by 
+  removing all subsequent commits.
+
+- git reset changes the project history. 
+
+- git reset can only work backwards from the current commit.
+
+- Resetting only affects tracked files.
+
+git reset <file>
+
+- Remove the specified file from the staging area, but leave the 
+  working directory unchanged. This unstages a file without 
+  overwriting any changes.
+
+git reset
+
+- "undoes an add"
+
+- Reset the staging area to match the most recent commit, but leave 
+  the working directory unchanged. This unstages all files without 
+  overwriting any changes, giving you the opportunity to re-build the
+  staged snapshot from scratch.
+
+git reset --hard
+
+- Reset the staging area and the working directory to match the most 
+  recent commit. In addition to unstaging changes, the --hard flag 
+  tells Git to overwrite all changes in the working directory, too. 
+
+git reset <commit>
+
+- "undoes a commit"
+
+- Move the current branch tip backward to <commit>, reset the staging
+  area to match, but leave the working directory alone. All changes 
+  made since <commit> will reside in the working directory, which 
+  lets you re-commit the project history using cleaner, more atomic 
+  snapshots.
+
+git reset --hard <commit>
+
+- Move the current branch tip backward to <commit> and reset both 
+  the staging area and the working directory to match. This 
+  obliterates not only the uncommitted changes, but all commits 
+  after <commit>, as well.
+
+git reset --hard HEAD~2
+
+- Moves the current branch backward by two commits.
+
+========================================================================
+gti clean
+========================================================================
+
+- The git clean command removes untracked files from your working 
+  directory.
+
+git clean -n
+
+- Perform a “dry run” of git clean. This will show you which files 
+  are going to be removed without actually doing it.
+
+git clean -f
+
+- Remove untracked files from the current directory. 
+
+- The -f (force) flag is required unless the clean.requireForce 
+  configuration option is set to false (it's true by default). This 
+  will not remove untracked folders or files specified by .gitignore.
+
+git clean -f <path>
+
+- Remove untracked files, but limit the operation to the specified 
+  path.
+
+git clean -df
+
+- Remove untracked files and untracked directories from the current 
+  directory.
+
+git clean -xf
+
+- Remove untracked files from the current directory as well as any 
+  files that Git usually ignores.
+
+# Edit some existing files
+# Add some new files
+# Realize you have no idea what you're doing
+
+# Undo changes in tracked files
+git reset --hard
+
+# Remove untracked files
+git clean -df
+
+- The working directory and the staging area will look exactly 
+  like the most recent commit, 
+
+========================================================================
+pushing changes (to remote repository)
+========================================================================
+
+- To send those changes to your remote repository, execute 
+
+git push origin master
+
+- Change master to whatever branch you want to push your changes to. 
+
+- If you have not cloned an existing repository and want to connect your
+  repository to a remote server, you need to add it with
+
+git remote add origin <server>
+
+- Now you are able to push your changes to the selected remote server.
+
+========================================================================
+branching
+========================================================================
+
+- create a new branch named "feature_x" and switch to it using
+
+git checkout -b feature_x
+
+- switch back to master
+
+git checkout master
+
+- and delete the branch again
+
+git branch -d feature_x
+
+- a branch is not available to others unless you push the branch to your
+  remote repository
+
+git push origin <branch>
+
+
+========================================================================
+update & merge
+========================================================================
+
+- to update your local repository to the newest commit, execute 
+
+git pull
+
+- in your working directory to fetch and merge remote changes.
+  to merge another branch into your active branch (e.g. master), use
+
+git merge <branch>
+
+- in both cases git tries to auto-merge changes. Unfortunately, this is 
+  not always possible and results in conflicts. You are responsible to 
+  merge those conflicts manually by editing the files shown by git. 
+  After changing, you need to mark them as merged with
+
+git add <filename>
+
+- Before merging changes, you can also preview them by using
+
+git diff <source_branch> <target_branch>
+
+
+==================================================
+Branching
+==================================================
+# Create a branch
+$ git checkout -b modify-README
+# List all the branches
+$ git branch
+
+# Check in a file that has been moved.
+$ git mv README.rdoc README.md
+$ git commit -a -m "Improve the README file"
+
+Note that we write the commit message in the present tense
+(and, technically speaking the imperative mood). Git models
+commits as a series of patches, and in this context it
+makes sense to describe what each commit does, rather than
+what it did. Moreover, this usage matches up with the
+commit messages generated by Git commands themselves. See
+the article “Shiny new commit styles” for more information.
+
+  Invalid
+  - Fixed bug
+
+  Valid
+  - Initialize repository
+  - Improve the README file
+  - Fix bug
+  - Finish toy app
+  - Finish static pages
+
+# Merge results back into master branch.
+$ git checkout master
+$ git merge modify-README
+
+# Delete a branch
+$ git branch -d modify-README
+
+# Push to github to complete
+$ git push
+
+==================================================
+Fixing Email Address: Change email for each commit
+==================================================
+
+Reference
+---------
+http://stackoverflow.com/questions/3042437/change-commit-author-at-one-specific-commit
+http://stackoverflow.com/questions/750172/change-the-author-of-a-commit-in-git
+
+Fixed last commits
+------------------
+git config --list
+git config --global user.name "Benjamin Tiddle"
+git config --global user.email benjamin@intheflow.com
+git commit --amend --reset-author -m "Fixed email associated with check-in."
+
+
+Fixed all previous commits (at once for ALL commits by any author)
+--------------------------
+git filter-branch -f --env-filter "GIT_AUTHOR_NAME='Benjamin Tiddle'; GIT_AUTHOR_EMAIL='benjamin@intheflow.com'; GIT_COMMITTER_NAME='Benjamin Tiddle'; GIT_COMMITTER_EMAIL='benjamin@intheflow.com';" HEAD
+
+git pull                       # Then had to pull from github
+git push -u origin master      # Then push to github
+
+
+==================================================
+Changing Github Repository Name
+==================================================
+1. Change github repository name via the setting button
+2. Then back a the terminal, using git remote set-url
+
+$ git remote -v
+$ git remote set-url origin <the-new-url>
+
+
+==================================================
+How do I configure Araxis Merge for use with Git?
+==================================================
+http://stackoverflow.com/questions/255202/how-do-i-view-git-diff-output-with-a-visual-diff-program
+
+edit: .gitconfig
+[diff]
+  tool = compare
+[difftool "compare"]
+  cmd = '/Applications/Araxis Merge.app/Contents/Utilities/compare' $LOCAL $REMOTE
+[difftool]
+  prompt = false
+
+ADDING ARAXIS TOOLS TO PATH IS NOT REQUIRE (unless of course you want to run the Araxis tools from the command line)
+EDIT: ~/.profile
+export PATH=$PATH:/Applications/Araxis\ Merge.app/Contents/Utilities
+
+araxisgitdiff
+araxisgitmerge
+araxishgmerge
+araxisopendiff
+araxisp4diff
+araxisp4winmrg
+araxissvndiff
+araxissvndiff3
+araxissvnmerge
+compare
+compare2
+
+
+==================================================
+rebase options
+==================================================
+
+pick 467d2fa [solid] RCNX-3416 Implement Multi-currency tests with 10x10 currencies
+
+# Rebase 41dbcea..467d2fa onto 41dbcea (1 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+
+

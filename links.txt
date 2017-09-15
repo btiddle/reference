@@ -1,0 +1,20 @@
+
+Gtihub
+https://github.com/btiddle
+https://github.com/btiddle/resttestlib.git
+
+Apache HttpClient GET/POST Request Examples
+http://www.technicalkeeda.com/java-tutorials/apache-httpclient-get-post-request-examples
+
+JSON Editor Online
+http://www.jsoneditoronline.org/
+
+Json Parser Online
+http://json.parser.online.fr/
+
+Java Documentation
+https://docs.oracle.com/javase/8/docs/api/index.html?java/
+
+CONQUERING THE COMMAND LINE
+http://conqueringthecommandline.com/
+

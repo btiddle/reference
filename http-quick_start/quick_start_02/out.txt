@@ -1,0 +1,95 @@
+========================================
+HttpGet
+========================================
+Config:                       null
+Protocol Version:             HTTP/1.1
+Request Line:                 GET http://example.com HTTP/1.1
+URI:                          http://example.com
+
+========================================
+CloseableHttpResponse
+========================================
+Locale:                       en_US
+Status Line:                  HTTP/1.1 200 OK
+Protocol Version:             HTTP/1.1
+Status Code:                  200
+Reason Phrase:                OK
+Contains Header 'Date':       true
+Header:                       Accept-Ranges: bytes
+Header:                       Cache-Control: max-age=604800
+Header:                       Content-Type: text/html
+Header:                       Date: Sat, 09 Sep 2017 17:26:15 GMT
+Header:                       Etag: "359670651"
+Header:                       Expires: Sat, 16 Sep 2017 17:26:15 GMT
+Header:                       Last-Modified: Fri, 09 Aug 2013 23:54:35 GMT
+Header:                       Server: ECS (rhv/818F)
+Header:                       Vary: Accept-Encoding
+Header:                       X-Cache: HIT
+First header 'Server':        Server: ECS (rhv/818F)
+Headers with 'ETag':          Etag: "359670651"
+Last header 'Content Type':   Content-Type: text/html
+Number of headers:            10
+Headers as 'Set-Cookie':      0
+Entity:                       org.apache.http.client.entity.DecompressingEntity@48ae9b55
+Entity String:                org.apache.http.client.entity.DecompressingEntity@48ae9b55
+Entity Class:                 class org.apache.http.client.entity.DecompressingEntity
+Entity Hashcode:              1219402581
+Entity Content Encoding:      null
+Entity Content Length:        -1
+Entity Content Type:          Content-Type: text/html
+Entity Content Type Name:     Content-Type
+Entity Content Type Value:    text/html
+Entity Content Type Elements: [Lorg.apache.http.HeaderElement;@1700915
+Entity Chunked:               false
+Entity Repeatable:            false
+Entity Streaming:             true
+Entity Content:               <!doctype html>
+Entity Content:               <html>
+Entity Content:               <head>
+Entity Content:                   <title>Example Domain</title>
+Entity Content:               
+Entity Content:                   <meta charset="utf-8" />
+Entity Content:                   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+Entity Content:                   <meta name="viewport" content="width=device-width, initial-scale=1" />
+Entity Content:                   <style type="text/css">
+Entity Content:                   body {
+Entity Content:                       background-color: #f0f0f2;
+Entity Content:                       margin: 0;
+Entity Content:                       padding: 0;
+Entity Content:                       font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+Entity Content:                       
+Entity Content:                   }
+Entity Content:                   div {
+Entity Content:                       width: 600px;
+Entity Content:                       margin: 5em auto;
+Entity Content:                       padding: 50px;
+Entity Content:                       background-color: #fff;
+Entity Content:                       border-radius: 1em;
+Entity Content:                   }
+Entity Content:                   a:link, a:visited {
+Entity Content:                       color: #38488f;
+Entity Content:                       text-decoration: none;
+Entity Content:                   }
+Entity Content:                   @media (max-width: 700px) {
+Entity Content:                       body {
+Entity Content:                           background-color: #fff;
+Entity Content:                       }
+Entity Content:                       div {
+Entity Content:                           width: auto;
+Entity Content:                           margin: 0 auto;
+Entity Content:                           border-radius: 0;
+Entity Content:                           padding: 1em;
+Entity Content:                       }
+Entity Content:                   }
+Entity Content:                   </style>    
+Entity Content:               </head>
+Entity Content:               
+Entity Content:               <body>
+Entity Content:               <div>
+Entity Content:                   <h1>Example Domain</h1>
+Entity Content:                   <p>This domain is established to be used for illustrative examples in documents. You may use this
+Entity Content:                   domain in examples without prior coordination or asking for permission.</p>
+Entity Content:                   <p><a href="http://www.iana.org/domains/example">More information...</a></p>
+Entity Content:               </div>
+Entity Content:               </body>
+Entity Content:               </html>

@@ -1,0 +1,279 @@
+===============================================================================
+Curl Cheetsheet Summary
+===============================================================================
+
+-F is  Content-Type: multipart/form-data;
+-d is  Content-Type: application/x-www-form-urlencoded
+
+===============================================================================
+The Basics
+===============================================================================
+
+#
+# Make an HTTP request to a given server and print its response out to the 
+# console. Default cURL type is GET when not specified.
+#
+# Also -d implies POST so the extra -X is completely superfluous 
+#
+
+curl quiet-waters-1228.herokuapp.com/hello
+
+#
+# Use the -i flag to see more information about the response.
+#
+
+===============================================================================
+Following Redirects (-L)
+===============================================================================
+
+#
+# Server returns a status code of 302 Moved Temporarily
+#
+
+curl -i quiet-waters-1228.herokuapp.com/redirectme
+
+    HTTP/1.1 302 Moved Temporarily
+#
+# Use the -L flag to follow redirects without having to first parse the 
+# response and build a second request to the correct resource.
+#
+# Postman: Does not have option to not follow link. (Maybe can do it with
+#          Proxy tool one post said but I did not try it yet.)
+# Rested:  Has check box to turn on/off follow of link
+
+curl -L quiet-waters-1228.herokuapp.com/redirectme
+
+    HTTP/1.1 200 OK
+
+===============================================================================
+Downloading Files (-O)
+===============================================================================
+
+#
+# Download image file, but bits get displayed on the screen
+#
+
+#
+# Use -O flag to download file
+#
+# Postman: Not able to specifiy different file name to save as
+# Rested:  Not able to specifiy different file name to save as
+
+curl -O http://quiet-waters-1228.herokuapp.com/assets/image.jpg
+
+===============================================================================
+Custom File Names (-o)
+===============================================================================
+
+#
+# Use the -o flag to give cURL a file name to save the file to
+#
+
+curl -o my_image.jpg http://quiet-waters-1228.herokuapp.com/assets/image.jpg
+
+===============================================================================
+Changing the HTTP Request Method (-X)
+===============================================================================
+
+#
+# Use the -X flag to specifiy a request method.
+# HTTP: GET is default method
+# FTP:  LIST is default method
+#
+# Postman: Need to set Content-Type to raw or binary to work correctly.
+#
+
+curl -X POST quiet-waters-1228.herokuapp.com/echo
+
+curl -X PUT quiet-waters-1228.herokuapp.com/echo
+
+===============================================================================
+Sending Parameters
+===============================================================================
+
+#
+# Append query string parameters to the URL itself. Passing query string
+# parameters will work with any request type.
+#
+
+curl -X POST "quiet-waters-1228.herokuapp.com/echo?fname=Mark&lname=Bates"
+
+===============================================================================
+Passing Data in a Request Body (-d)
+===============================================================================
+
+#
+# Use -d flag to pass data as part of the request body that is not a GET.
+#
+# Postman: Using 'raw body type' resolves to -d paramater
+# Rested:  Uses 'Custom HTTP Body' resolves to -d paramater
+
+curl -X POST -d "fname=Mark&lname=Bates" quiet-waters-1228.herokuapp.com/echo
+
+#
+# Use -d flag to also pass JSON data
+#
+# Note back slash needed for command line. Remove for Postman and Rested.
+
+===============================================================================
+Using a File for a Request Body (-d)
+===============================================================================
+
+#
+# Use -d @<filename> flag to read in a file and send as the body of the request
+#
+# Postman: Using 'raw body type' instead of -d parameter
+# Rested:  Uses 'Custom HTTP Body' instead of -d parameter
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo
+
+===============================================================================
+Form Parameters (-F)
+===============================================================================
+
+#
+# Use -F flag to pass parameters like as posted from an HTML form.
+#
+# Postman: Using 'form-data' resolves to -F parameter
+# Rested:  Using 'Form-encoded' resolves to -F parameter
+#
+
+# Using one -F parameter
+curl -i -X POST -F "user[fname]=Mark&user[lname]=Bates&foo=bar" \
+  quiet-waters-1228.herokuapp.com/echo -H "Accept: application/json"
+
+# Versus using three -F parameters
+curl -i -X POST -F user[fname]=Mark -F user[lname]=Bates -F foo=bar \
+  quiet-waters-1228.herokuapp.com/echo -H "Accept: application/json"
+
+===============================================================================
+File Uploads with Form Parameters
+===============================================================================
+
+#
+# Uploading a file using the -F flag is almost identical to using the -d flag.
+# The only difference is that the file must be given a parameter name.
+#
+# Postman: Can specifiy filename, but then displays as as if stdout
+# Rested:  Do not see how to specify filename as field value.
+#
+
+curl -X POST -F user[fname]=Mark -F user[lname]=Bates -F foo=bar \
+  -F user[photo]=@path/to/image.jpg quiet-waters-1228.herokuapp.com/echo 
+
+===============================================================================
+Setting Headers (-H)
+===============================================================================
+
+#
+# Use the -H flag  to tell the server which type of content we want returned
+#
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo \
+  -H "Accept: application/json"
+
+#
+# cURL allows multiple -H flags on a request
+#
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo \
+  -H "Accept: application/json" -H "X-Auth: 1234567890"
+
+===============================================================================
+Basic HTTP Auth (-u)
+===============================================================================
+
+#
+# Access a resource that requires authentication when none provided.
+# 
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -i -X POST quiet-waters-1228.herokuapp.com/login
+
+    HTTP/1.1 401 Unauthorized
+
+#
+# Use -u flag to authenticate against basic HTTP authentication
+#
+# Postman: Works correctly, with "Basic Auth"
+# Rested:  Works correctly, with 'Present Before Authentication Challenge'
+#
+
+curl -i -X POST -u "user1:password1" quiet-waters-1228.herokuapp.com/login
+
+===============================================================================
+Saving and Sending Cookies/Headers (-D, -b)
+===============================================================================
+
+#
+# To authenticate against basic HTTP authentication that is behind a login,
+# error case.
+#
+# We are greeted with a 401. The server is trying to use a session cookie to 
+# authenticate us, and we don’t have one. To solve this problem, we first need
+# to hit the login endpoint using the -u flag, save the session cookie that is
+# returned, and then pass that session cookie back again on subsequent requests.
+#
+# Postman: Doesn't get 401 error in both cases
+# Rested:  Correctly retruns the 401 error in both cases.
+
+    HTTP/1.1 401 Unauthorized
+
+# or with "Authorization" but still doesn't work
+curl -i -u "user1:password1" quiet-waters-1228.herokuapp.com/whoami
+
+    HTTP/1.1 401 Unauthorized
+
+#
+# The -D flag will tell cURL to dump headers and cookies into a specified file
+# in the current directory.
+#
+
+curl -X POST -D headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+or
+curl -i -X POST -D headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+or
+curl -X POST --dump-header headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+
+#
+# With this headers file now saved, we can pass it around to subsequent 
+# requests and the server will have access to the session cookie that it needs,
+# along with all of the original headers that were part of the response.
+#
+# By passing the -b flag and giving it the name of the file that we had 
+# previously saved, Listing 3.22 shows that we have successfully accessed the
+# end point that was previously unavailable to us.
+#
+
+curl -i -b headers quiet-waters-1228.herokuapp.com/whoami
+
+===============================================================================
+Using the Cookie Jar (-c)
+===============================================================================
+
+#
+# Use the -c flag for storing just the cookies. Give it the name of a file we 
+# wish to store the cookies in.
+#
+
+curl -X POST -c cookies.txt -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+
+#
+# Using the -b flag, as we did earlier, we can send the contents of the 
+# cookies.txt file to the server with the request.
+#
+
+curl -i -b cookies.txt quiet-waters-1228.herokuapp.com/whoami
+

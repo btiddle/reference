@@ -1,0 +1,1135 @@
+http://curl.haxx.se/
+http://curl.haxx.se/docs/manual.html
+
+# http://curl.haxx.se/docs/httpscripting.html
+# If you use curl to POST to a site that immediately redirects you to another
+# page, you can safely use --location (-L) and --data/--form together. Curl
+# will only use POST in the first request, and then revert to GET in the
+# following operations.
+
+===============================================================================
+Cheetsheet
+===============================================================================
+
+-F is  Content-Type: multipart/form-data;
+-d is  Content-Type: application/x-www-form-urlencoded
+
+
+===============================================================================
+The Basics
+===============================================================================
+
+#
+# Make an HTTP request to a given server and print its response out to the 
+# console. Default cURL type is GET when not specified.
+#
+# Also -d implies POST so the extra -X is completely superfluous 
+# (per http://stackoverflow.com/questions/10628275/how-to-use-curl-with-django-csrf-tokens-and-post-requests)
+#
+
+curl quiet-waters-1228.herokuapp.com/hello
+
+#
+# Use the -i flag to see more information about the response.
+#
+
+curl -i quiet-waters-1228.herokuapp.com/hello
+
+    GET /hello HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:41:03 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "a0bb15ce430e40738d857e3e7dfe0de7"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 490da19c-7d14-4ee3-bd48-eb23aaa566fa
+    X-Runtime: 0.001835
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    Hello, World!
+    Thank you for cURLing me!
+
+
+===============================================================================
+Following Redirects (-L)
+===============================================================================
+
+#
+# Server returns a status code of 302 Moved Temporarily
+#
+
+curl -i quiet-waters-1228.herokuapp.com/redirectme
+
+    GET /redirectme HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 302 Moved Temporarily
+    Date: Mon, 08 Dec 2014 20:43:15 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Location: http://quiet-waters-1228.herokuapp.com/hello
+    Content-Type: text/html; charset=utf-8
+    Cache-Control: no-cache
+    X-Request-Id: b210828e-63d8-44ff-9667-c055ae21ba97
+    X-Runtime: 0.001959
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <html><body>You are being <a href="http://quiet-waters-1228.herokuapp.com/hello">redirected</a>.</body></html>
+
+#
+# Use the -L flag to follow redirects without having to first parse the 
+# response and build a second request to the correct resource.
+#
+# Postman: Does not have option to not follow link. (Maybe can do it with
+#          Proxy tool one post said but I did not try it yet.)
+# Rested:  Has check box to turn on/off follow of link
+
+curl -L quiet-waters-1228.herokuapp.com/redirectme
+
+    GET /redirectme HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 302 Moved Temporarily
+    Date: Mon, 08 Dec 2014 20:48:00 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Location: http://quiet-waters-1228.herokuapp.com/hello
+    Content-Type: text/html; charset=utf-8
+    Cache-Control: no-cache
+    X-Request-Id: 0c960616-7501-4567-a544-8c2a40737563
+    X-Runtime: 0.001559
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <html><body>You are being <a href="http://quiet-waters-1228.herokuapp.com/hello">redirected</a>.</body></html>
+    
+    GET /hello HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:48:00 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "a0bb15ce430e40738d857e3e7dfe0de7"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: d7868041-8cc3-4e22-8598-1f09dabfca06
+    X-Runtime: 0.001804
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    Hello, World!
+    Thank you for cURLing me!
+
+
+===============================================================================
+Downloading Files (-O)
+===============================================================================
+
+#
+# Download image file, but bits get displayed on the screen
+#
+
+curl http://quiet-waters-1228.herokuapp.com/assets/image.jpg
+
+    GET /assets/image.jpg HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:50:14 GMT
+    Connection: keep-alive
+    Content-Type: image/jpeg
+    Content-Length: 423159
+    Cache-Control: public, must-revalidate
+    Last-Modified: Sat, 16 Nov 2013 22:37:27 GMT
+    Etag: "16e10e89eaa7a3f9297baa04350f02b2"
+    X-Request-Id: d0ca5de6-0ea1-4cb7-8007-65bf92770b68
+    X-Runtime: 0.000644
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    ...
+    ... the image bits go here
+    ...
+
+#
+# Use -O flag to download file 
+#
+# Postman: Not able to specifiy different file name to save as
+# Rested:  Not able to specifiy different file name to save as
+
+curl -O http://quiet-waters-1228.herokuapp.com/assets/image.jpg
+
+    GET /assets/image.jpg HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:54:48 GMT
+    Connection: keep-alive
+    Content-Type: image/jpeg
+    Content-Length: 423159
+    Cache-Control: public, must-revalidate
+    Last-Modified: Sat, 16 Nov 2013 22:37:27 GMT
+    Etag: "16e10e89eaa7a3f9297baa04350f02b2"
+    X-Request-Id: c7775ce7-5a2b-40bf-a08d-5e45765d078a
+    X-Runtime: 0.000779
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    ...
+    ... the image bits go here
+    ...
+
+===============================================================================
+Custom File Names (-o)
+===============================================================================
+
+#
+# Use the -o flag to give cURL a file name to save the file to
+#
+
+curl -o my_image.jpg http://quiet-waters-1228.herokuapp.com/assets/image.jpg
+
+    GET /assets/image.jpg HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:56:34 GMT
+    Connection: keep-alive
+    Content-Type: image/jpeg
+    Content-Length: 423159
+    Cache-Control: public, must-revalidate
+    Last-Modified: Sat, 16 Nov 2013 22:37:27 GMT
+    Etag: "16e10e89eaa7a3f9297baa04350f02b2"
+    X-Request-Id: 2828c824-e0b5-4681-9e9b-6644270120ac
+    X-Runtime: 0.000736
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    ...
+    ... the image bits go here
+    ...
+
+===============================================================================
+Changing the HTTP Request Method (-X)
+===============================================================================
+
+#
+# Use the -X flag to specifiy a request method. 
+# HTTP: GET is default method
+# FTP:  LIST is default method
+#
+# Postman: Need to set Content-Type to raw or binary to work correctly.
+#
+
+curl -X POST quiet-waters-1228.herokuapp.com/echo
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:58:33 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "453f05eb5a06c5017e14a45878a3ea71"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 04df7533-08b0-4b54-ab8b-e7f60ed5772d
+    X-Runtime: 0.003334
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          POST
+        </span>
+      </p>
+    
+    </body>
+    </html>
+
+curl -X PUT quiet-waters-1228.herokuapp.com/echo
+
+    PUT /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 20:59:59 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "f6c31934a1f6df16dfca694fa938a954"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 6fdbfd32-4dfa-4467-9f81-c31b5d89d98f
+    X-Runtime: 0.002445
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          PUT
+        </span>
+      </p>
+    
+    </body>
+    </html>
+
+===============================================================================
+Sending Parameters
+===============================================================================
+
+#
+# Append query string parameters to the URL itself. Passing query string 
+# parameters will work with any request type.
+
+curl -X POST "quiet-waters-1228.herokuapp.com/echo?fname=Mark&lname=Bates"
+
+    POST /echo?fname=Mark&lname=Bates HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:01:03 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "e97176ee99c81ed4bf2b8e5d65fcd43a"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: c7b68a3f-5a25-4db6-9d42-c56d5af875c0
+    X-Runtime: 0.004132
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo?fname=Mark&lname=Bates
+        </span>
+      </p>
+      <p>
+        <strong>parameters:</strong>
+        <span>
+          {"fname"=>"Mark", "lname"=>"Bates"}
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          POST
+        </span>
+      </p>
+    
+    </body>
+    </html>
+
+===============================================================================
+Passing Data in a Request Body (-d)
+===============================================================================
+
+#
+# Use -d flag to pass data as part of the request body that is not a GET.
+#
+# Postman: Using 'raw body type' resolves to -d paramater
+# Rested:  Uses 'Custom HTTP Body' resolves to -d paramater
+
+curl -X POST -d "fname=Mark&lname=Bates" quiet-waters-1228.herokuapp.com/echo
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Content-Length: 22
+    Content-Type: application/x-www-form-urlencoded
+    
+    fname=Mark&lname=Bates
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:05:22 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "1d9119f09628ce31c84ad68a07a44e1e"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 82510f2e-b792-4487-8646-d4a48a930561
+    X-Runtime: 0.028509
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo
+        </span>
+      </p>
+      <p>
+        <strong>parameters:</strong>
+        <span>
+          {"fname"=>"Mark", "lname"=>"Bates"}
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          POST
+        </span>
+      </p>
+      <p>
+        <strong>body:</strong>
+        <span>
+          fname=Mark&lname=Bates
+        </span>
+      </p>
+    
+    </body>
+    </html>
+
+#
+# Use -d flag to also pass JSON data
+#
+# Note back slash needed for command line. Remove for Postman and Rested.
+
+curl -X POST -d "{\"name\":\"Mark\"}" quiet-waters-1228.herokuapp.com/echo
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Content-Length: 15
+    Content-Type: application/x-www-form-urlencoded
+    
+    {"name":"Mark"}
+
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:07:41 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "7e22b8339816cdcade2467897508d66d"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 1d3de287-3bd6-4129-a76b-bdc67bc850f7
+    X-Runtime: 0.003135
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          POST
+        </span>
+      </p>
+      <p>
+        <strong>body:</strong>
+        <span>
+          {"name"=>"Mark"}
+        </span>
+      </p>
+    
+    </body>
+    </html>
+
+===============================================================================
+Using a File for a Request Body (-d)
+===============================================================================
+
+#
+# Use -d @<filename> flag to read in a file and send as the body of the request
+#
+# Postman: Using 'raw body type' instead of -d parameter
+# Rested:  Uses 'Custom HTTP Body' instead of -d parameter
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Content-Length: 119
+    Content-Type: application/x-www-form-urlencoded
+    
+    {  "lname": "Bates",  "fname": "Mark",  "site": "http://www.markbates.com",  "twitter": "http://twitter.com/markbates"}
+
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:09:54 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: text/html; charset=utf-8
+    Etag: "174699e31686b59420c17f5aa3bb0293"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 7a77adc7-cef5-4f84-a4fa-e124ff4d6991
+    X-Runtime: 0.003109
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Unix and Linux Commands for Developers</title>
+      <link href="/assets/application.css" media="all" rel="stylesheet" />
+      <script src="/assets/application.js"></script>
+    </head>
+    <body>
+    
+      <p>
+        <strong>url:</strong>
+        <span>
+          http://quiet-waters-1228.herokuapp.com/echo
+        </span>
+      </p>
+      <p>
+        <strong>method:</strong>
+        <span>
+          POST
+        </span>
+      </p>
+      <p>
+        <strong>body:</strong>
+        <span>
+          {"lname"=>"Bates", "fname"=>"Mark", "site"=>"http://www.markbates.com", "twitter"=>"http://twitter.com/markbates"}
+        </span>
+      </p>
+    
+    </body>
+</html>
+
+===============================================================================
+Form Parameters (-F)
+===============================================================================
+
+#
+# Use -F flag to pass parameters like as posted from an HTML form.
+#
+# Postman: Using 'form-data' resolves to -F parameter
+# Rested:  Using 'Form-encoded' resolves to -F parameter
+#
+
+# Using one -F parameter
+curl -i -X POST -F "user[fname]=Mark&user[lname]=Bates&foo=bar" quiet-waters-1228.herokuapp.com/echo -H "Accept: application/json"
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: application/json
+    Content-Length: 176
+    Expect: 100-continue
+    Content-Type: multipart/form-data; boundary=------------------------b72df63dfa07bff8
+    
+    HTTP/1.1 100 Continue
+    
+    --------------------------b72df63dfa07bff8
+    Content-Disposition: form-data; name="user[fname]"
+    
+    Mark&user[lname]=Bates&foo=bar
+    --------------------------b72df63dfa07bff8--
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:19:22 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "1bc5031c2f763d868be4340f59e9294b"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: e6e5d076-3d0f-4d98-a448-faf56058b5fb
+    X-Runtime: 0.002203
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {
+      "url": "http://quiet-waters-1228.herokuapp.com/echo",
+      "parameters": {"user":{"fname":"Mark\u0026user[lname]=Bates\u0026foo=bar"}},
+      "method": "POST",
+      "body": "--------------------------b72df63dfa07bff8\r\nContent-Disposition: form-data; name=\"user[fname]\"\r\n\r\nMark&user[lname]=Bates&foo=bar\r\n--------------------------b72df63dfa07bff8--\r\n"
+    }
+
+# Versus using three -F parameters
+curl -i -X POST -F user[fname]=Mark -F user[lname]=Bates -F foo=bar quiet-waters-1228.herokuapp.com/echo -H "Accept: application/json"
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: application/json
+    Content-Length: 350
+    Expect: 100-continue
+    Content-Type: multipart/form-data; boundary=------------------------b55b94b99a47626a
+    
+    HTTP/1.1 100 Continue
+    
+    --------------------------b55b94b99a47626a
+    Content-Disposition: form-data; name="user[fname]"
+    
+    Mark
+    --------------------------b55b94b99a47626a
+    Content-Disposition: form-data; name="user[lname]"
+    
+    Bates
+    --------------------------b55b94b99a47626a
+    Content-Disposition: form-data; name="foo"
+    
+    bar
+    --------------------------b55b94b99a47626a--
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:23:54 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "ef0f8d42d5f78331efacc48fd0ad8f80"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 22fdcf9f-4ae0-47db-a025-9b2f238f3bbc
+    X-Runtime: 0.002603
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {
+      "url": "http://quiet-waters-1228.herokuapp.com/echo",
+      "parameters": {"user":{"fname":"Mark","lname":"Bates"},"foo":"bar"},
+      "method": "POST",
+      "body": "--------------------------b55b94b99a47626a\r\nContent-Disposition: form-data; name=\"user[fname]\"\r\n\r\nMark\r\n--------------------------b55b94b99a47626a\r\nContent-Disposition: form-data; name=\"user[lname]\"\r\n\r\nBates\r\n--------------------------b55b94b99a47626a\r\nContent-Disposition: form-data; name=\"foo\"\r\n\r\nbar\r\n--------------------------b55b94b99a47626a--\r\n"
+    }
+
+===============================================================================
+File Uploads with Form Parameters
+===============================================================================
+
+#
+# Uploading a file using the -F flag is almost identical to using the -d flag.
+# The only difference is that the file must be given a parameter name.
+#
+# Postman: Can specifiy filename, but then displays as as if stdout
+# Rested:  Do not see how to specify filename as field value.
+#
+
+curl -X POST -F user[fname]=Mark -F user[lname]=Bates -F foo=bar \
+  -F user[photo]=@path/to/image.jpg quiet-waters-1228.herokuapp.com/echo 
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Content-Length: 423657
+    Expect: 100-continue
+    Content-Type: multipart/form-data; boundary=------------------------8c57ae74d343ef9b
+    
+    HTTP/1.1 100 Continue
+    
+    --------------------------8c57ae74d343ef9b
+    Content-Disposition: form-data; name="user[fname]"
+    
+    Mark
+    --------------------------8c57ae74d343ef9b
+    Content-Disposition: form-data; name="user[lname]"
+    
+    Bates
+    --------------------------8c57ae74d343ef9b
+    Content-Disposition: form-data; name="foo"
+    
+    bar
+    --------------------------8c57ae74d343ef9b
+    Content-Disposition: form-data; name="user[photo]"; filename="image.jpg"
+    Content-Type: image/jpeg
+
+    ...
+    ... file contents go here
+    ...
+
+===============================================================================
+Setting Headers (-H)
+===============================================================================
+
+#
+# Use the -H flag  to tell the server which type of content we want returned
+#
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo \
+  -H "Accept: application/json"
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: application/json
+    Content-Length: 119
+    Content-Type: application/x-www-form-urlencoded
+    
+    {  "lname": "Bates",  "fname": "Mark",  "site": "http://www.markbates.com",  "twitter": "http://twitter.com/markbates"}
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:39:40 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "5346f090964fc11e2acc30c5f558740f"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 3f3b9bdc-e7f5-4f60-8b8c-b74762a156d8
+    X-Runtime: 0.002175
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {
+      "url": "http://quiet-waters-1228.herokuapp.com/echo",
+      "method": "POST",
+      "body": {
+        "lname": "Bates",
+        "fname": "Mark",
+        "site": "http://www.markbates.com",
+        "twitter": "http://twitter.com/markbates"
+      }
+    }
+
+#
+# cURL allows multiple -H flags on a request
+#
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -X POST -d @form_data.json quiet-waters-1228.herokuapp.com/echo \
+  -H "Accept: application/json" -H "X-Auth: 1234567890"
+
+    POST /echo HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: application/json
+    X-Auth: 1234567890
+    Content-Length: 119
+    Content-Type: application/x-www-form-urlencoded
+    
+    {  "lname": "Bates",  "fname": "Mark",  "site": "http://www.markbates.com",  "twitter": "http://twitter.com/markbates"}
+
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:41:35 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "60424e2abe18e64f4f897758af91e29a"
+    Cache-Control: max-age=0, private, must-revalidate
+    X-Request-Id: 951da162-ed9c-477a-8d3a-a5fb64556e25
+    X-Runtime: 0.001915
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {
+      "x-auth": "1234567890",
+      "url": "http://quiet-waters-1228.herokuapp.com/echo",
+      "method": "POST",
+      "body": {
+        "lname": "Bates",
+        "fname": "Mark",
+        "site": "http://www.markbates.com",
+        "twitter": "http://twitter.com/markbates"
+      }
+    }
+
+===============================================================================
+Basic HTTP Auth (-u)
+===============================================================================
+
+#
+# Access a resource that requires authentication when none provided.
+# 
+# Postman: Works correctly
+# Rested:  Works correctly
+#
+
+curl -i -X POST quiet-waters-1228.herokuapp.com/login
+
+    POST /login HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 401 Unauthorized
+    Date: Mon, 08 Dec 2014 21:45:07 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Cache-Control: no-cache
+    X-Request-Id: 78227d62-23ab-464a-9611-93cc817cff19
+    X-Runtime: 0.001763
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"error":"Unknown User"}
+
+#
+# Use -u flag to authenticate against basic HTTP authentication
+#
+# Postman: Works correctly, with "Basic Auth"
+# Rested:  Works correctly, with 'Present Before Authentication Challenge'
+#
+
+curl -i -X POST -u "user1:password1" quiet-waters-1228.herokuapp.com/login
+
+    POST /login HTTP/1.1
+    Authorization: Basic dXNlcjE6cGFzc3dvcmQx
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 21:46:11 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "768e41b20e1e385d06f9b2da6f7e0f08"
+    Cache-Control: max-age=0, private, must-revalidate
+    Set-Cookie: _curl_test_app_rails_session=dUs0V1N1cHJBdEM0YllJMENqM3A0S1ovb2U1MTk1WlkwdFdmMFdqWjFwQTZXeDlMMkxYOFRuUU1kK3l5SU5aeCt1NWl2N1A0NFpZUERJdEJxWkNURmhBQ3d3M244MFdYM1ljS0lTYXZHaDlxalduYWM4ckhZRURNS2crcnl1cHQtLVhtN2VmR09Va1grY002eFl0OW4yTXc9PQ%3D%3D--5dd100b7b3784cfb0e57f7d5fa36a4b11b5a6a51; path=/; HttpOnly
+    X-Request-Id: 3acaf65d-9637-4d1a-bfb8-c09bb132c6e7
+    X-Runtime: 0.048672
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"id":1,"name":"User 1","password":"password1","username":"user1"}
+
+===============================================================================
+Saving and Sending Cookies/Headers (-D, -b)
+===============================================================================
+
+#
+# To authenticate against basic HTTP authentication that is behind a login,
+# error case.
+#
+# We are greeted with a 401. The server is trying to use a session cookie to 
+# authenticate us, and we don’t have one. To solve this problem, we first need
+# to hit the login endpoint using the -u flag, save the session cookie that is
+# returned, and then pass that session cookie back again on subsequent requests.
+#
+# Postman: Doesn't get 401 error in both cases
+# Rested:  Correctly retruns the 401 error in both cases.
+
+curl -i quiet-waters-1228.herokuapp.com/whoami
+    GET /whoami HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 401 Unauthorized
+    Date: Mon, 08 Dec 2014 21:51:59 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Cache-Control: no-cache
+    X-Request-Id: 3279cc56-6a21-42f8-babe-bb899b1cdbee
+    X-Runtime: 0.002047
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"error":"Unknown User"}
+
+
+
+
+# or with "Authorization" but still doesn't work
+curl -i -u "user1:password1" quiet-waters-1228.herokuapp.com/whoami
+
+    GET /whoami HTTP/1.1
+    Authorization: Basic dXNlcjE6cGFzc3dvcmQx
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 401 Unauthorized
+    Date: Mon, 08 Dec 2014 21:52:36 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Cache-Control: no-cache
+    X-Request-Id: 77dbd5d7-cf44-47c0-a7c2-50ea373c4156
+    X-Runtime: 0.001877
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"error":"Unknown User"}
+
+#
+# The -D flag will tell cURL to dump headers and cookies into a specified file
+# in the current directory.
+#
+
+curl -X POST -D headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+or
+curl -i -X POST -D headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+or
+curl -X POST --dump-header headers -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+
+    POST /login HTTP/1.1
+    Authorization: Basic dXNlcjE6cGFzc3dvcmQx
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 22:02:16 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "768e41b20e1e385d06f9b2da6f7e0f08"
+    Cache-Control: max-age=0, private, must-revalidate
+    Set-Cookie: _curl_test_app_rails_session=NmVzVjlDOUtOYUhXYVJYL1g0eG53L0ZSRTFwdlo2T1VQSmNJQUVzeG85Ymgwdk1jR0lHcEdtV21SZG0zRjBaK2lrcERjUG9tUENieGczVW0walZXUTY2Sm9NMlNGbEZTM3NVMVowME9TWGVHTVBWVWo3QUlyVU5VWklKelhNTFgtLVZrbm41MTVGaVpKM3lVUFNNSHpYUWc9PQ%3D%3D--4122ba6ef689161db81fc12747bf994b1485ebfc; path=/; HttpOnly
+    X-Request-Id: bee3689f-4b9e-4c71-8a24-938f684eb15f
+    X-Runtime: 0.002230
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"id":1,"name":"User 1","password":"password1","username":"user1"}
+
+#
+# With this headers file now saved, we can pass it around to subsequent 
+# requests and the server will have access to the session cookie that it needs,
+# along with all of the original headers that were part of the response.
+#
+# By passing the -b flag and giving it the name of the file that we had 
+# previously saved, Listing 3.22 shows that we have successfully accessed the
+# end point that was previously unavailable to us.
+#
+
+curl -i -b headers quiet-waters-1228.herokuapp.com/whoami
+
+    GET /whoami HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Cookie: _curl_test_app_rails_session=NmVzVjlDOUtOYUhXYVJYL1g0eG53L0ZSRTFwdlo2T1VQSmNJQUVzeG85Ymgwdk1jR0lHcEdtV21SZG0zRjBaK2lrcERjUG9tUENieGczVW0walZXUTY2Sm9NMlNGbEZTM3NVMVowME9TWGVHTVBWVWo3QUlyVU5VWklKelhNTFgtLVZrbm41MTVGaVpKM3lVUFNNSHpYUWc9PQ%3D%3D--4122ba6ef689161db81fc12747bf994b1485ebfc
+
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 22:03:43 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "768e41b20e1e385d06f9b2da6f7e0f08"
+    Cache-Control: max-age=0, private, must-revalidate
+    Set-Cookie: _curl_test_app_rails_session=alBBb0lTaDdPQUQvQ1gvRWdiYW1MNDF1U2oxNTY0RVh4YXNVLzVBYWU3NmFWRzlzMzYwQjVyaTZubkhNZFhyMnJHMG1ieWt6b3Nad3BWcW51K2sxZ203L1BrNCsxWjgrNU5WT3dESjA1ZnJ6cVRTRE8xY3cxRGY2K000NGs2aEstLU5nL3lpL0U3aUFIRVB0blZyQkFITmc9PQ%3D%3D--17c29a4fc185e87204b5533fdc17e47daf0b2ded; path=/; HttpOnly
+    X-Request-Id: 76706cde-7d56-4253-977c-222cd22df8bd
+    X-Runtime: 0.006213
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+
+    {"id":1,"name":"User 1","password":"password1","username":"user1"}
+
+===============================================================================
+Using the Cookie Jar (-c)
+===============================================================================
+
+#
+# Use the -c flag for storing just the cookies. Give it the name of a file we 
+# wish to store the cookies in.
+#
+
+curl -X POST -c cookies.txt -u "user1:password1" \
+  quiet-waters-1228.herokuapp.com/login
+
+    POST /login HTTP/1.1
+    Authorization: Basic dXNlcjE6cGFzc3dvcmQx
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 22:06:11 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "768e41b20e1e385d06f9b2da6f7e0f08"
+    Cache-Control: max-age=0, private, must-revalidate
+    Set-Cookie: _curl_test_app_rails_session=THZ2ZGdOS2J5amIzTHovRlhWU0JlT3VGcFZvZ1VsQWpaVFBPV0Nxa0lqMVBXQUx1TE9QT1NnbGxQelJDelhIT2MxN3grLzl0TDRHemM4d1pzY3FlSXY2blhWbDdDMC9zMVhpOUEvQjlNRkdVbDM0TEJMckkyRVU5am9leDZXNjMtLVFpUDBOeFkySVd6clo0TVRVY1RkNUE9PQ%3D%3D--92e1bb6c894fe0ab6468ef188167bf91e47ea18d; path=/; HttpOnly
+    X-Request-Id: 042ab77a-e0bc-414c-8de6-d0ddaf086ff5
+    X-Runtime: 0.001970
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"id":1,"name":"User 1","password":"password1","username":"user1"}
+
+
+$ cat cookies.txt 
+
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/docs/http-cookies.html
+# This file was generated by libcurl! Edit at your own risk.
+
+#HttpOnly_quiet-waters-1228.herokuapp.com FALSE / FALSE 0 _curl_test_app_rails_session  MC9LTnhrb2FpN24xU2FuaEIzTE9WdDdTNUQwZzROVmRmVDdnTzFOdEZVZTdUbCsrVlZMb3ErVWw4Yjg0UzB4ZitvNUJvUVhVMU1aMXQzSUdHY282VFJZVXdIQzBBSVZTTEoxUEM1T2dzMkxKbVdKZ3hCcUtXaTgxNHBQYVBXOFMtLUpRZXFuOWEzZU0xd0NzeHYvSmF2a2c9PQ%3D%3D--73f4537aafc75883a9a1c605244b9e3a9a3e4d65
+
+#
+# Using the -b flag, as we did earlier, we can send the contents of the 
+# cookies.txt file to the server with the request.
+#
+
+curl -i -b cookies.txt quiet-waters-1228.herokuapp.com/whoami
+
+    GET /whoami HTTP/1.1
+    User-Agent: curl/7.37.1
+    Host: quiet-waters-1228.herokuapp.com
+    Accept: */*
+    Cookie: _curl_test_app_rails_session=TUZKYklXRHlPcHRuc05NMUx4ckY5Zlk0azBDVHQ2eTFYdyt1bzFVdldIaDI0SVcwRXJibnFFb0p2OUdRQ1AvTWhEc2N4R29QZ1Vhb1dGKzZRRDFINGR4V1JpVG9xTjZnZHo1L1NEUjNCTnZlSjFKcmJRcWs4VUVsSG5EL1Fpbk0tLVRucXFLeDI1Y2pqOUVFamxYSGVkb1E9PQ%3D%3D--90171a61acfd46c4a0f3c01a4af48ba5adf82394
+    
+    HTTP/1.1 200 OK
+    Date: Mon, 08 Dec 2014 22:09:59 GMT
+    Connection: close
+    X-Frame-Options: SAMEORIGIN
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Ua-Compatible: chrome=1
+    Content-Type: application/json; charset=utf-8
+    Etag: "768e41b20e1e385d06f9b2da6f7e0f08"
+    Cache-Control: max-age=0, private, must-revalidate
+    Set-Cookie: _curl_test_app_rails_session=TUgrZjRlU28weDdPMVM1dWt1TlkrV3dERkp6TVFpeVZFWUVxbWpOY1BoVnU4c1NTUEpzQjhkSzBMR0YvcHo1cnoyOHJHL2dZUVllTWFGeWVkWUhHZnp4SWJ0V1k2Z09yc2dxaHc5a1ZoU1oyZUtud3ZmN3FCblI2Y0t5dU96RHctLVlBOS92MWJGS0xNOWIyZDcyZ1FHSGc9PQ%3D%3D--2d6c7c2566c37fa384350bd459142f725052c836; path=/; HttpOnly
+    X-Request-Id: d0f4c40b-6a33-4d2f-9345-20bb2b5a1287
+    X-Runtime: 0.002267
+    Server: thin 1.6.1 codename Death Proof
+    Via: 1.1 vegur
+    
+    {"id":1,"name":"User 1","password":"password1","username":"user1"}
+
+

@@ -30,3 +30,41 @@ HTTP Test server that accepts GET/Post calls
 - https://stackoverflow.com/questions/5725430/http-test-server-that-accepts-get-post-calls
 - http://httpbin.org/
 
+
+Endpoints for HTTP Testing
+https://lornajane.net/posts/2013/endpoints-for-http-testing
+
+Learn REST: A RESTful Tutorial
+http://www.restapitutorial.com/
+
+
+What are some fun API's to play with? 
+https://www.reddit.com/r/webdev/comments/3wrswc/what_are_some_fun_apis_to_play_with/
+
+A collective list of public JSON APIs for use in web development.
+- https://github.com/toddmotto/public-apis
+
+Marketplace Explore APIs
+https://market.mashape.com/explore?sort=developers
+
+>>>>
+https://developer.todoist.com/rest/v8/?shell#overview
+Todoist REST API.
+
+
+>>>>
+JSONPlaceholder
+http://jsonplaceholder.typicode.com/
+
+
+>>>>
+Iterable API Explorer
+https://api.iterable.com/api/docs#/
+
+
+>>>>
+Import.io APIs
+http://api.docs.import.io/#!/extraction.import.io/get_extractor_extractorId
+
+
+

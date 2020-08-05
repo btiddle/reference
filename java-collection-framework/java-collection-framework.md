@@ -52,3 +52,4 @@
 * [BeginnersBook](https://beginnersbook.com/java-tutorial-for-beginners-with-examples/)
 * [BeginnersBook, Collections](https://beginnersbook.com/java-collections-tutorials/)
 * [w3schools](https://www.w3schools.com/java/default.asp)
+* [HowToDoInJava](https://howtodoinjava.com/)

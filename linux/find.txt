@@ -1,0 +1,100 @@
+find.txt
+
+Problem:
+    Find the string "1,836,311,903" that appears in any .java file
+
+Solution:
+    cd exercises/src subdirectory
+    find . -type f -name *java -exec grep "1,836,311,903" '{}' \; -print
+
+
+## Todo: Remove above and restructure below as a .md file
+
+=== Conquering the Command Line
+    http://conqueringthecommandline.com/book/find
+
+=== find and echo file names only with pattern found
+    https://unix.stackexchange.com/questions/342008/find-and-echo-file-names-only-with-pattern-found
+
+=== How to exclude a directory in find . command
+    https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command
+
+=== Exclude list of files from find
+    https://stackoverflow.com/questions/22558245/exclude-list-of-files-from-find
+
+
+=== syntax
+
+find PATH_TO_SEARCH OPTIONS_TO_USE PATTERN_TO_SEARCH_FOR
+
+=== examples
+
+find . -name \*model.rb
+
+find . -type f -exec grep -i locate '{}' \; -print
+
+find . -type f -exec grep -i codox '{}' \; -print
+
+find . -type f -exec grep -i AWS_ACCESS_KEY_ID '{}' \; -print
+
+find . -type f -exec grep -i ARTIFACTORY '{}' \; -print
+
+# find usage
+# -type f(file) or d(directory)
+# -name reg exp for filename
+# -path reg exp of path
+
+
+# grep usage
+#  -I    Ignore binary files
+#  -l    Print filename only
+#  -L    Print non-matching lines
+
+
+# bash usage
+# '{}' \; -print      path on one line followed by lines that match
+# '{}' +              path on each line
+
+
+# Display: "filepath + newline + list of matching lines"
+find . -type f -exec grep -i "1,836,311,903" '{}' \; -print
+
+# Display: "filepath + ":" + matching line"
+find . -type f  -exec grep -i "1,836,311,903" '{}' +
+
+# Display: "filename" only
+find . -type f  -exec grep -i -l "1,836,311,903" '{}' +
+
+
+# Exclude binary files
+find . -type f -exec grep -i -l -I "coding style" '{}' +
+
+# Exclude some files
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" \) -exec grep -i -l "coding style" '{}' +
+
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" \) -exec grep -i -l "pgp" '{}' +
+
+
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" \) -exec grep -i -l "password" '{}' +
+add-host
+network=bridge
+password
+
+
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" \) -exec grep -i -l "Error: Could not find or load main class clojure.main" '{}' +
+Error: Could not find or load main class clojure.main
+
+
+
+# Print cheat sheet for "Destructuring in Clojure"
+find . -type f -name \*clj -exec grep "\;-" '{}' \; -print
+
+=== Scratch pad
+
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" ! -name "*.jar" \) -exec grep -i -l "mangl" '{}' +
+
+find . -type f  \( ! -name "*.flv" ! -name "*.mov" ! -name "*.jar" \) -exec grep -i -l -I "Debug Configuration" '{}' +
+
+find . -type f  -name "*.md" -exec grep -i -l "Debug Configuration" '{}' +
+
+Debug Configuration
